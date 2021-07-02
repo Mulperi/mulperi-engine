@@ -3,13 +3,11 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
-
 namespace Mulperi
 {
     typedef struct Config
     {
-        string title;
+        std::string title;
         int screenWidth;
         int screenHeight;
         bool fullScreen;
@@ -19,12 +17,10 @@ namespace Mulperi
     class Renderer
     {
     public:
-        Renderer(){};
-        virtual ~Renderer(){};
-        virtual void Render();
+        virtual void Render() = 0;
     };
 
-    class SDLRendererWrapper : Renderer
+    class SDLRendererWrapper : public Renderer
     {
         SDL_Renderer *renderer;
         SDL_Window *window;
@@ -95,29 +91,25 @@ namespace Mulperi
     class Game
     {
         Simulation sim;
-        Renderer renderer;
+        Renderer *renderer;
         Controls controls;
         Config config;
         bool running;
 
     public:
-        Game(Config gameConfig, Renderer gameRenderer) : running(true)
-        // renderer(gameRenderer)
-        {
-            config = gameConfig;
-        }
+        Game(Config gameConfig, Renderer *gameRenderer) : config(gameConfig), running(true), renderer(gameRenderer) {}
         ~Game()
         {
             SDL_Quit();
         }
         void Run()
         {
-            // while (running)
-            // {
-            //     // sim.Update();
-            //     controls.HandleInput(running);
-            //     renderer.Render(); // fps delay is in here
-            // }
+            while (running)
+            {
+                // sim.Update();
+                controls.HandleInput(running);
+                renderer->Render(); // fps delay is in here
+            }
         }
     };
 
