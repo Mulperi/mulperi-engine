@@ -17,6 +17,38 @@ namespace Mulperi
         int fps;
     } Config;
 
+    class Input
+    {
+    public:
+        struct keyboard
+        {
+            bool up;
+            bool down;
+            bool left;
+            bool right;
+            // jne.
+        } keyboard;
+        virtual void HandleInput(bool &running) = 0;
+    };
+
+    class Actor
+    {
+    public:
+        Input *inputManager;
+        Actor() {}
+        Actor(Input *i)
+        {
+            std::cout << "inputti" << std::endl;
+            inputManager = i;
+        }
+        virtual void Update() = 0;
+        virtual void Render() = 0;
+        void SetInputManager(Input *i)
+        {
+            inputManager = i;
+        };
+    };
+
     class Renderer
     {
     public:
@@ -59,28 +91,20 @@ namespace Mulperi
             SDL_RenderFillRect(renderer, &rect);
 
             SDL_RenderPresent(renderer);
-            SDL_Delay(300); // Pause
+            SDL_Delay(1000 / 60); // Pause
         }
     };
 
     class Simulation
     {
     public:
-        void Update(){};
-    };
-
-    class Input
-    {
-    public:
-        struct keyboard
+        void Update(const std::unordered_map<std::string, Actor *> &actors)
         {
-            bool up;
-            bool down;
-            bool left;
-            bool right;
-            // jne.
-        } keyboard;
-        virtual void HandleInput(bool &running) = 0;
+            for (const auto it : actors)
+            {
+                it.second->Update();
+            }
+        };
     };
 
     class InputWrapperSDL : public Input
@@ -144,21 +168,13 @@ namespace Mulperi
         }
     };
 
-    class Actor
-    {
-    public:
-        virtual void Update() = 0;
-        virtual void Render() = 0;
-    };
-
     class ActorManager
     {
-        std::unordered_map<std::string, Actor *> actors;
-
     public:
+        std::unordered_map<std::string, Actor *> actors;
         void CreateActor(std::string name, Actor *actor)
         {
-            actors.at(name) = actor;
+            actors[name] = actor;
         }
         void DeleteActor(std::string name)
         {
@@ -171,11 +187,11 @@ namespace Mulperi
         Simulation sim;
         Renderer *renderer;
         Input *input;
-        ActorManager actorManager;
         Config config;
         bool running;
 
     public:
+        ActorManager actorManager;
         Game(Config gameConfig,
              Renderer *gameRenderer,
              Input *gameInput) : config(gameConfig),
@@ -191,7 +207,7 @@ namespace Mulperi
         {
             while (running)
             {
-                // sim.Update();
+                sim.Update(actorManager.actors);
                 input->HandleInput(running);
                 renderer->Render(); // fps delay is in here
             }
@@ -202,7 +218,7 @@ namespace Mulperi
         }
         void DeleteActor(std::string name)
         {
-            actorManager.CreateActor(name);
+            actorManager.DeleteActor(name);
         }
     };
 
