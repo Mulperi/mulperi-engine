@@ -2,6 +2,9 @@
 #include <SDL2/SDL.h>
 #include <string>
 #include <iostream>
+#include <cstdio>
+#include <vector>
+#include <unordered_map>
 
 namespace Mulperi
 {
@@ -20,13 +23,13 @@ namespace Mulperi
         virtual void Render() = 0;
     };
 
-    class SDLRendererWrapper : public Renderer
+    class RendererWrapperSDL : public Renderer
     {
         SDL_Renderer *renderer;
         SDL_Window *window;
 
     public:
-        SDLRendererWrapper()
+        RendererWrapperSDL()
         {
             SDL_Init(SDL_INIT_VIDEO);
             window = SDL_CreateWindow("window name", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 512, 512, SDL_WINDOW_OPENGL);
@@ -40,7 +43,7 @@ namespace Mulperi
                 printf("Could not create renderer: %s\n", SDL_GetError());
             }
         }
-        ~SDLRendererWrapper()
+        ~RendererWrapperSDL()
         {
             SDL_DestroyRenderer(renderer);
             SDL_DestroyWindow(window);
@@ -66,12 +69,65 @@ namespace Mulperi
         void Update(){};
     };
 
-    class Controls
+    class Input
     {
     public:
-        Controls() {}
-        void HandleInput(bool &running)
+        struct keyboard
         {
+            bool up;
+            bool down;
+            bool left;
+            bool right;
+            // jne.
+        } keyboard;
+        virtual void HandleInput(bool &running) = 0;
+    };
+
+    class InputWrapperSDL : public Input
+    {
+        const Uint8 *keyState;
+
+    public:
+        InputWrapperSDL() : keyState(nullptr){};
+        void HandleInput(bool &running) override
+        {
+            keyState = SDL_GetKeyboardState(NULL);
+            if (keyState[SDL_SCANCODE_UP])
+            {
+                keyboard.up = true;
+            }
+            else
+            {
+                keyboard.up = false;
+            }
+
+            if (keyState[SDL_SCANCODE_DOWN])
+            {
+                keyboard.down = true;
+            }
+            else
+            {
+                keyboard.down = false;
+            }
+
+            if (keyState[SDL_SCANCODE_LEFT])
+            {
+                keyboard.left = true;
+            }
+            else
+            {
+                keyboard.left = false;
+            }
+
+            if (keyState[SDL_SCANCODE_RIGHT])
+            {
+                keyboard.right = true;
+            }
+            else
+            {
+                keyboard.right = false;
+            }
+
             SDL_Event event;
             while (SDL_PollEvent(&event))
             {
@@ -88,16 +144,45 @@ namespace Mulperi
         }
     };
 
+    class Actor
+    {
+    public:
+        virtual void Update() = 0;
+        virtual void Render() = 0;
+    };
+
+    class ActorManager
+    {
+        std::unordered_map<std::string, Actor *> actors;
+
+    public:
+        void CreateActor(std::string name, Actor *actor)
+        {
+            actors.at(name) = actor;
+        }
+        void DeleteActor(std::string name)
+        {
+            actors.erase(name);
+        }
+    };
+
     class Game
     {
         Simulation sim;
         Renderer *renderer;
-        Controls controls;
+        Input *input;
+        ActorManager actorManager;
         Config config;
         bool running;
 
     public:
-        Game(Config gameConfig, Renderer *gameRenderer) : config(gameConfig), running(true), renderer(gameRenderer) {}
+        Game(Config gameConfig,
+             Renderer *gameRenderer,
+             Input *gameInput) : config(gameConfig),
+                                 renderer(gameRenderer),
+                                 input(gameInput), running(true)
+        {
+        }
         ~Game()
         {
             SDL_Quit();
@@ -107,9 +192,17 @@ namespace Mulperi
             while (running)
             {
                 // sim.Update();
-                controls.HandleInput(running);
+                input->HandleInput(running);
                 renderer->Render(); // fps delay is in here
             }
+        }
+        void CreateActor(std::string name, Actor *actor)
+        {
+            actorManager.CreateActor(name, actor)
+        }
+        void DeleteActor(std::string name)
+        {
+            actorManager.CreateActor(name)
         }
     };
 
