@@ -1,13 +1,15 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "mulperi.h"
+// #include "player.h"
 #include <string>
 // Windows compile: g++ main.cpp -o main.exe -I include -L . -lmingw32 -lSDL2 -lSDL2main
 // Linux compile: g++ main.cpp -o main I /usr/include -lSDL2
 
 class Player : public Mulperi::Actor
 {
-    Player();
+public:
+    Player(){};
     void Update() override
     {
     }
@@ -26,7 +28,7 @@ int main(int argc, char *argv[])
 
     Player player1();
 
-    myGame.CreateActor("player", player1);
+    myGame.CreateActor("player", &player1);
 
     myGame.Run();
 

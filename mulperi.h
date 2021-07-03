@@ -198,11 +198,11 @@ namespace Mulperi
         }
         void CreateActor(std::string name, Actor *actor)
         {
-            actorManager.CreateActor(name, actor)
+            actorManager.CreateActor(name, actor);
         }
         void DeleteActor(std::string name)
         {
-            actorManager.CreateActor(name)
+            actorManager.CreateActor(name);
         }
     };
 
