@@ -9,24 +9,25 @@
 class Player : public Mulperi::Actor
 {
 public:
-    Player(Mulperi::Input *i) : Mulperi::Actor(i){};
+    Player(Mulperi::Input *i, std::string type, float x, float y) : Mulperi::Actor(i, type, x, y){};
+
     void Update() override
     {
         if (inputManager->keyboard.up)
         {
-            std::cout << "player press up" << std::endl;
+            pos.y--;
         }
         if (inputManager->keyboard.down)
         {
-            std::cout << "player press down" << std::endl;
+            pos.y++;
         }
         if (inputManager->keyboard.left)
         {
-            std::cout << "player press left" << std::endl;
+            pos.x--;
         }
         if (inputManager->keyboard.right)
         {
-            std::cout << "player press right" << std::endl;
+            pos.x++;
         }
     }
     void Render() override
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
     Mulperi::InputWrapperSDL input;
     Mulperi::Game myGame(config, &renderer, &input);
 
-    Player player1(&input); // give pointer to input manager
+    Player player1(&input, "rect", 100, 100); // give pointer to input manager
 
     myGame.CreateActor("player", &player1);
 

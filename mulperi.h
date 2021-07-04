@@ -35,24 +35,24 @@ namespace Mulperi
     {
     public:
         Input *inputManager;
-        Actor() {}
-        Actor(Input *i)
+        struct pos
         {
-            std::cout << "inputti" << std::endl;
+            float x;
+            float y;
+        } pos;
+        Actor() {}
+        Actor(Input *i, std::string type, float x, float y) : pos({x, y})
+        {
             inputManager = i;
         }
         virtual void Update() = 0;
         virtual void Render() = 0;
-        void SetInputManager(Input *i)
-        {
-            inputManager = i;
-        };
     };
 
     class Renderer
     {
     public:
-        virtual void Render() = 0;
+        virtual void Render(const std::unordered_map<std::string, Actor *> &actors) = 0;
     };
 
     class RendererWrapperSDL : public Renderer
@@ -80,15 +80,19 @@ namespace Mulperi
             SDL_DestroyRenderer(renderer);
             SDL_DestroyWindow(window);
         }
-        void Render() override
+        void Render(const std::unordered_map<std::string, Actor *> &actors) override
         {
             SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
             SDL_RenderClear(renderer);
 
-            SDL_Rect rect = {100, 100, 100, 100};
-            SDL_RenderDrawRect(renderer, &rect);
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            SDL_RenderFillRect(renderer, &rect);
+            for (const auto it : actors)
+            {
+                it.second->Update();
+                SDL_Rect rect = {(int)it.second->pos.x, (int)it.second->pos.y, 50, 50};
+                SDL_RenderDrawRect(renderer, &rect);
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(renderer, &rect);
+            }
 
             SDL_RenderPresent(renderer);
             SDL_Delay(1000 / 60); // Pause
@@ -208,8 +212,8 @@ namespace Mulperi
             while (running)
             {
                 sim.Update(actorManager.actors);
+                renderer->Render(actorManager.actors); // fps delay is in here
                 input->HandleInput(running);
-                renderer->Render(); // fps delay is in here
             }
         }
         void CreateActor(std::string name, Actor *actor)
