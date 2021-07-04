@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "mulperi.h"
+#include "mulperi_sdl.h"
 #include <string>
 // Windows compile: g++ main.cpp -o main.exe -I include -L . -lmingw32 -lSDL2 -lSDL2main
 // Linux compile: g++ main.cpp -o main I /usr/include -lSDL2
@@ -35,20 +36,28 @@ public:
     }
 };
 
-// class Peli : public Mulperi::Game
-// {
-// public:
-//     Peli(Mulperi::Config gameConfig,
-//          Mulperi::Renderer *gameRenderer,
-//          Mulperi::Input *gameInput) : Mulperi::Game(gameConfig, gameRenderer, gameInput)
-//     {
-//     }
+class Peli : public Mulperi::Game
+{
+public:
+    Peli(Mulperi::Config gameConfig,
+         Mulperi::Renderer *gameRenderer,
+         Mulperi::Input *gameInput) : Mulperi::Game(gameConfig, gameRenderer, gameInput)
+    {
+    }
+    ~Peli() {}
 
-//     void UserUpdate() override
-//     {
-//         std::cout << "user update" << std::endl;
-//     }
-// };
+    void Update() override
+    {
+        if (sceneManager.currentSceneName == "menu")
+        {
+            std::cout << "scene: menu" << std::endl;
+        }
+        if (sceneManager.currentSceneName == "level1")
+        {
+            std::cout << "scene: level1" << std::endl;
+        }
+    }
+};
 
 void customUpdate()
 {
@@ -57,19 +66,17 @@ void customUpdate()
 
 int main(int argc, char *argv[])
 {
-
     Mulperi::Config config = {"mulperi engine", 512, 512, false, 60};
     Mulperi::RendererWrapperSDL renderer;
     Mulperi::InputWrapperSDL input;
-    Mulperi::Game myGame(config, &renderer, &input, &customUpdate);
-
     Player player1(&input, "rect", 100, 100); // give pointer to input manager
 
-    myGame.CreateActor("player", &player1);
-    // myGame.CreateScene("level1");
-    // myGame.AddActorToScene("player", "level1");
+    Peli peli(config, &renderer, &input);
+    peli.sceneManager.AttachActorToScene("player", &player1, "level1");
+    peli.sceneManager.AttachActorToScene("player", &player1, "menu");
+    peli.sceneManager.SetCurrentSceneName("menu");
 
-    myGame.Run();
+    peli.Run();
 
     return EXIT_SUCCESS;
 }
