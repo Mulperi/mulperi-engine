@@ -13,19 +13,19 @@ public:
 
     void Update() override
     {
-        if (inputManager->keyboard.up)
+        if (input->keyboard.up)
         {
             pos.y--;
         }
-        if (inputManager->keyboard.down)
+        if (input->keyboard.down)
         {
             pos.y++;
         }
-        if (inputManager->keyboard.left)
+        if (input->keyboard.left)
         {
             pos.x--;
         }
-        if (inputManager->keyboard.right)
+        if (input->keyboard.right)
         {
             pos.x++;
         }

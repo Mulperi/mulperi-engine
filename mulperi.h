@@ -34,7 +34,7 @@ namespace Mulperi
     class Actor
     {
     public:
-        Input *inputManager;
+        Input *input;
         struct pos
         {
             float x;
@@ -43,7 +43,7 @@ namespace Mulperi
         Actor() {}
         Actor(Input *i, std::string type, float x, float y) : pos({x, y})
         {
-            inputManager = i;
+            input = i;
         }
         virtual void Update() = 0;
         virtual void Render() = 0;
@@ -87,7 +87,6 @@ namespace Mulperi
 
             for (const auto it : actors)
             {
-                it.second->Update();
                 SDL_Rect rect = {(int)it.second->pos.x, (int)it.second->pos.y, 50, 50};
                 SDL_RenderDrawRect(renderer, &rect);
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
