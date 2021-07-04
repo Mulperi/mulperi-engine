@@ -79,6 +79,7 @@ namespace Mulperi
         {
             SDL_DestroyRenderer(renderer);
             SDL_DestroyWindow(window);
+            SDL_Quit();
         }
         void Render(const std::unordered_map<std::string, Actor *> &actors) override
         {
@@ -185,6 +186,10 @@ namespace Mulperi
         }
     };
 
+    class SceneManager
+    {
+    };
+
     class Game
     {
         Simulation sim;
@@ -192,20 +197,24 @@ namespace Mulperi
         Input *input;
         Config config;
         bool running;
+        ActorManager actorManager;
+        void (*userUpdate)();
+
+        // std::unordered_map<std::string, > scenes;
 
     public:
-        ActorManager actorManager;
+        // virtual void UserUpdate();
+        // virtual ~Game() {}
         Game(Config gameConfig,
              Renderer *gameRenderer,
-             Input *gameInput) : config(gameConfig),
-                                 renderer(gameRenderer),
-                                 input(gameInput), running(true)
+             Input *gameInput, void (*customUpdate)()) : config(gameConfig),
+                                                         renderer(gameRenderer),
+                                                         input(gameInput),
+                                                         userUpdate(customUpdate),
+                                                         running(true)
         {
         }
-        ~Game()
-        {
-            SDL_Quit();
-        }
+
         void Run()
         {
             while (running)
@@ -213,6 +222,7 @@ namespace Mulperi
                 sim.Update(actorManager.actors);
                 renderer->Render(actorManager.actors); // fps delay is in here
                 input->HandleInput(running);
+                userUpdate();
             }
         }
         void CreateActor(std::string name, Actor *actor)
@@ -223,6 +233,18 @@ namespace Mulperi
         {
             actorManager.DeleteActor(name);
         }
+        // void CreateScene(std::string name)
+        // {
+        //     sceneManager.CreateScene(name);
+        // }
+        // void AddActorToScene(std::string actorName, std::string sceneName)
+        // {
+        //     sceneManager.AddActorToScene(actorName, sceneName);
+        // }
+        // void DeleteScene(std::string name)
+        // {
+        //     sceneManager.DeleteScene(name);
+        // }
     };
 
 }
