@@ -48,6 +48,12 @@ public:
 
     void Update() override
     {
+
+        if (uptime > 3)
+        {
+            sceneManager.currentSceneName = "level1";
+        }
+
         if (sceneManager.currentSceneName == "menu")
         {
             std::cout << "scene: menu" << std::endl;

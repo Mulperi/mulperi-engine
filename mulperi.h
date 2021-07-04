@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <vector>
 #include <unordered_map>
+#include <time.h>
 
 namespace Mulperi
 {
@@ -99,9 +100,11 @@ namespace Mulperi
         Input *input;
         Config config;
         bool running;
+        int starttime;
         // void (*userUpdate)();
 
     public:
+        int uptime;
         SceneManager sceneManager;
         virtual void Update() = 0;
         virtual ~Game() {}
@@ -111,12 +114,14 @@ namespace Mulperi
                                  renderer(gameRenderer),
                                  input(gameInput)
         {
+            starttime = time(NULL);
         }
 
         void Run()
         {
             while (running)
             {
+                uptime = time(NULL) - starttime;
                 sim.Update(sceneManager.GetCurrentSceneActors());
                 renderer->Render(sceneManager.GetCurrentSceneActors()); // fps delay is in here
                 input->HandleInput(running);

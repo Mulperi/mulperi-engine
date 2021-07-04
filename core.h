@@ -1,4 +1,4 @@
-// old c-like version of sdl helper functions
+// old c-like version of sdl helper functions, just for reference
 
 #ifndef MULPERICORE_H
 #define MULPERICORE_H
