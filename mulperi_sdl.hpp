@@ -1,5 +1,5 @@
 #include "include/SDL2/SDL.h"
-#include "mulperi.h"
+#include "mulperi.hpp"
 
 namespace Mulperi
 {

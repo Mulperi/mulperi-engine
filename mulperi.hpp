@@ -48,9 +48,11 @@ namespace Mulperi
             float y;
         } pos;
         Actor() {}
-        Actor(Input *i, std::string type, float x, float y, BODY_TYPE bodyType) : pos({x, y})
+        Actor(Input *i, std::string type, float x, float y, BODY_TYPE bodyType) : pos()
         {
             input = i;
+            pos.x = x;
+            pos.y = y;
         }
         virtual void Update() = 0;
         virtual void Render() = 0;
@@ -68,7 +70,7 @@ namespace Mulperi
         void Update(const std::unordered_map<std::string, Actor *> &actors)
         {
             // Render actors.
-            for (const auto it : actors)
+            for (std::pair<std::string, Actor *> it : actors)
             {
                 it.second->Update();
             }
@@ -151,6 +153,7 @@ namespace Mulperi
                                  input(gameInput)
         {
             starttime = time(NULL);
+            running = true;
         }
 
         void Run()

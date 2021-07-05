@@ -1,7 +1,7 @@
 #include "include/SDL2/SDL.h"
 #include <stdio.h>
-#include "mulperi.h"
-#include "mulperi_sdl.h"
+#include "mulperi.hpp"
+#include "mulperi_sdl.hpp"
 #include <string>
 // Windows compile: g++ main.cpp -o main.exe -I include -L . -lmingw32 -lSDL2 -lSDL2main -lbox2d
 // Linux compile: g++ main.cpp -o main I /usr/include -lSDL2 -lbox2d
