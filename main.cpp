@@ -65,14 +65,10 @@ public:
     }
 };
 
-void customUpdate()
-{
-    std::cout << "custom update" << std::endl;
-}
-
 class Level : public Mulperi::Scene
 {
-
+public:
+    Level(Mulperi::Input *input) : Mulperi::Scene(input) {}
     void Update() override
     {
     }
@@ -86,7 +82,7 @@ int main(int argc, char *argv[])
 
     Player player1(&input, "rect", 100, 100, Mulperi::BODY_DYNAMIC);
     Peli peli(config, &renderer, &input);
-    Level level1;
+    Level level1(&input);
     level1.AttachActor("player", &player1);
     peli.sceneManager.AttachScene("level1", &level1);
     peli.sceneManager.SetCurrentSceneName("level1");
