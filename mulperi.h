@@ -5,9 +5,16 @@
 #include <vector>
 #include <unordered_map>
 #include <time.h>
-
+#include "include/box2d/box2d.h"
 namespace Mulperi
 {
+    enum BODY_TYPE
+    {
+        BODY_STATIC,
+        BODY_DYNAMIC,
+        SKIP_PHYSICS
+    };
+
     typedef struct Config
     {
         std::string title;
@@ -41,7 +48,7 @@ namespace Mulperi
             float y;
         } pos;
         Actor() {}
-        Actor(Input *i, std::string type, float x, float y) : pos({x, y})
+        Actor(Input *i, std::string type, float x, float y, BODY_TYPE bodyType) : pos({x, y})
         {
             input = i;
         }
@@ -60,6 +67,7 @@ namespace Mulperi
     public:
         void Update(const std::unordered_map<std::string, Actor *> &actors)
         {
+            // Render actors.
             for (const auto it : actors)
             {
                 it.second->Update();
@@ -67,28 +75,54 @@ namespace Mulperi
         };
     };
 
+    class Scene
+    {
+    public:
+        std::unordered_map<std::string, Actor *> actors;
+        Scene() {}
+        // virtual ~Scene() = 0;
+        virtual void Update() = 0;
+        void AttachActor(std::string actorName, Actor *actor)
+        {
+            actors[actorName] = actor;
+        }
+        void DetachActor(std::string actorName, Actor *actor)
+        {
+            actors.erase(actorName);
+        }
+    };
+
     class SceneManager
     {
     private:
-        std::unordered_map<std::string, std::unordered_map<std::string, Actor *>> scenes;
+        // std::unordered_map<std::string, std::unordered_map<std::string, Actor *>> scenes;
+        std::unordered_map<std::string, Scene *> scenes;
 
     public:
         std::string currentSceneName;
-        void AttachActorToScene(std::string actorName, Actor *actor, std::string sceneName)
-        {
-            scenes[sceneName][actorName] = actor;
-        }
-        void DetachActorFromScene(std::string actorName, Actor *actor, std::string sceneName)
-        {
-            scenes[sceneName].erase(actorName);
-        }
+        // void AttachActorToScene(std::string actorName, Actor *actor, std::string sceneName)
+        // {
+        //     scenes[sceneName][actorName] = actor;
+        // }
+        // void DetachActorFromScene(std::string actorName, Actor *actor, std::string sceneName)
+        // {
+        //     scenes[sceneName].erase(actorName);
+        // }
         void SetCurrentSceneName(std::string name)
         {
             currentSceneName = name;
         }
         std::unordered_map<std::string, Actor *> GetCurrentSceneActors()
         {
-            return scenes[currentSceneName];
+            return scenes[currentSceneName]->actors;
+        }
+        void AttachScene(std::string sceneName, Scene *scene)
+        {
+            scenes[sceneName] = scene;
+        }
+        void DetachScene(std::string sceneName)
+        {
+            scenes.erase(sceneName);
         }
     };
 
@@ -129,5 +163,4 @@ namespace Mulperi
             }
         }
     };
-
 }

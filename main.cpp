@@ -1,16 +1,16 @@
-#include <SDL2/SDL.h>
+#include "include/SDL2/SDL.h"
 #include <stdio.h>
 #include "mulperi.h"
 #include "mulperi_sdl.h"
 #include <string>
-// Windows compile: g++ main.cpp -o main.exe -I include -L . -lmingw32 -lSDL2 -lSDL2main
-// Linux compile: g++ main.cpp -o main I /usr/include -lSDL2
+// Windows compile: g++ main.cpp -o main.exe -I include -L . -lmingw32 -lSDL2 -lSDL2main -lbox2d
+// Linux compile: g++ main.cpp -o main I /usr/include -lSDL2 -lbox2d
 
 // Actor need to call base class constructor with pointer to input manager.
 class Player : public Mulperi::Actor
 {
 public:
-    Player(Mulperi::Input *i, std::string type, float x, float y) : Mulperi::Actor(i, type, x, y){};
+    Player(Mulperi::Input *i, std::string type, float x, float y, Mulperi::BODY_TYPE bodyType) : Mulperi::Actor(i, type, x, y, bodyType){};
 
     void Update() override
     {
@@ -70,19 +70,31 @@ void customUpdate()
     std::cout << "custom update" << std::endl;
 }
 
+class Level : public Mulperi::Scene
+{
+
+    void Update() override
+    {
+    }
+};
+
 int main(int argc, char *argv[])
 {
     Mulperi::Config config = {"mulperi engine", 512, 512, false, 60};
     Mulperi::RendererWrapperSDL renderer;
     Mulperi::InputWrapperSDL input;
-    Player player1(&input, "rect", 100, 100); // give pointer to input manager
 
+    Player player1(&input, "rect", 100, 100, Mulperi::BODY_DYNAMIC);
     Peli peli(config, &renderer, &input);
-    peli.sceneManager.AttachActorToScene("player", &player1, "level1");
-    peli.sceneManager.AttachActorToScene("player", &player1, "menu");
-    peli.sceneManager.SetCurrentSceneName("menu");
-
+    Level level1;
+    level1.AttachActor("player", &player1);
+    peli.sceneManager.AttachScene("level1", &level1);
+    peli.sceneManager.SetCurrentSceneName("level1");
     peli.Run();
 
     return EXIT_SUCCESS;
 }
+
+// peli.sceneManager.AttachActorToScene("player", &player1, "level1");
+// peli.sceneManager.AttachActorToScene("player", &player1, "menu");
+// peli.sceneManager.SetCurrentSceneName("menu");
