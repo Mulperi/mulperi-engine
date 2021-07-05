@@ -77,9 +77,11 @@ namespace Mulperi
 
     class Scene
     {
+        Input *input;
+
     public:
         std::unordered_map<std::string, Actor *> actors;
-        Scene() {}
+        Scene(Input *i) : input(i) {}
         // virtual ~Scene() = 0;
         virtual void Update() = 0;
         void AttachActor(std::string actorName, Actor *actor)
