@@ -3,6 +3,8 @@
 #include "mulperi.hpp"
 #include "mulperi_sdl.hpp"
 #include <string>
+#include "include/box2d/box2d.h"
+
 // Windows compile: g++ main.cpp -o main.exe -I include -L . -lmingw32 -lSDL2 -lSDL2main -lbox2d
 // Linux compile: g++ main.cpp -o main I /usr/include -lSDL2 -lbox2d
 
@@ -82,8 +84,13 @@ int main(int argc, char *argv[])
 
     Player player1(&input, "rect", 100, 100, Mulperi::BODY_DYNAMIC);
     Peli peli(config, &renderer, &input);
+
+    b2Vec2 gravity(0, -10);
+    b2World world(gravity);
+
     Level level1(&input);
     level1.AttachActor("player", &player1);
+
     peli.sceneManager.AttachScene("level1", &level1);
     peli.sceneManager.SetCurrentSceneName("level1");
     peli.Run();

@@ -8,6 +8,13 @@
 #include "include/box2d/box2d.h"
 namespace Mulperi
 {
+
+    typedef struct World
+    {
+        // b2Vec2 gravity;
+        b2World world;
+    } World;
+
     enum BODY_TYPE
     {
         BODY_STATIC,
