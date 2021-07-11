@@ -8,6 +8,7 @@
 #include "include/box2d/box2d.h"
 namespace Mulperi
 {
+    float SCALE = 30.f;
 
     typedef struct World
     {
@@ -54,12 +55,30 @@ namespace Mulperi
             float x;
             float y;
         } pos;
+
+        b2BodyDef bodyDef;
+        b2Body *body;
+        b2PolygonShape shape;
+        b2FixtureDef fixture;
+
         Actor() {}
-        Actor(Input *i, std::string type, float x, float y, BODY_TYPE bodyType) : pos()
+        Actor(Input *i, std::string type, float x, float y, BODY_TYPE bodyType, b2World *world) : pos()
         {
             input = i;
-            pos.x = x;
-            pos.y = y;
+            // pos.x = x;
+            // pos.y = y;
+            body = world->CreateBody(&bodyDef);
+            bodyDef.position = b2Vec2(x / SCALE, y / SCALE);
+            if (bodyType == BODY_DYNAMIC)
+            {
+                bodyDef.type = b2_dynamicBody;
+            }
+
+            shape.SetAsBox((50.f / 2) / SCALE, (50.f / 2) / SCALE);
+            fixture.density = 1.f;
+            fixture.friction = 0.7f;
+            fixture.shape = &shape;
+            body->CreateFixture(&fixture);
         }
         virtual void Update() = 0;
         virtual void Render() = 0;
@@ -68,14 +87,21 @@ namespace Mulperi
     class Renderer
     {
     public:
-        virtual void Render(const std::unordered_map<std::string, Actor *> &actors) = 0;
+        virtual void Render(const std::unordered_map<std::string, Actor *> &actors, b2World *world) = 0;
     };
 
     class Simulation
     {
+
     public:
+        b2Vec2 gravity;
+        b2World world;
+        Simulation() : gravity(b2Vec2(0, -10)), world(b2World(gravity))
+        {
+        }
         void Update(const std::unordered_map<std::string, Actor *> &actors)
         {
+            world.Step(1 / 60.f, 8, 3);
             // Render actors.
             for (std::pair<std::string, Actor *> it : actors)
             {
@@ -162,14 +188,17 @@ namespace Mulperi
             starttime = time(NULL);
             running = true;
         }
-
+        b2World *GetWorld()
+        {
+            return &sim.world;
+        }
         void Run()
         {
             while (running)
             {
                 uptime = time(NULL) - starttime;
                 sim.Update(sceneManager.GetCurrentSceneActors());
-                renderer->Render(sceneManager.GetCurrentSceneActors()); // fps delay is in here
+                renderer->Render(sceneManager.GetCurrentSceneActors(), GetWorld()); // fps delay is in here
                 input->HandleInput(running);
                 Update();
             }

@@ -12,7 +12,7 @@
 class Player : public Mulperi::Actor
 {
 public:
-    Player(Mulperi::Input *i, std::string type, float x, float y, Mulperi::BODY_TYPE bodyType) : Mulperi::Actor(i, type, x, y, bodyType){};
+    Player(Mulperi::Input *i, std::string type, float x, float y, Mulperi::BODY_TYPE bodyType, b2World *world) : Mulperi::Actor(i, type, x, y, bodyType, world){};
 
     void Update() override
     {
@@ -82,11 +82,11 @@ int main(int argc, char *argv[])
     Mulperi::RendererWrapperSDL renderer;
     Mulperi::InputWrapperSDL input;
 
-    Player player1(&input, "rect", 100, 100, Mulperi::BODY_DYNAMIC);
     Peli peli(config, &renderer, &input);
+    Player player1(&input, "rect", 100, 100, Mulperi::BODY_DYNAMIC, peli.GetWorld());
 
-    b2Vec2 gravity(0, -10);
-    b2World world(gravity);
+    // b2Vec2 gravity(0, -10);
+    // b2World world(gravity);
 
     Level level1(&input);
     level1.AttachActor("player", &player1);
